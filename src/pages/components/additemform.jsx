@@ -1,6 +1,6 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import firebase from "firebase"
-
+import getFirebase from "./firebase"
 const AddItemForm = () => {
   //useState() hook captures the value from the input value
   const [name, setName] = useState("")
@@ -11,28 +11,40 @@ const AddItemForm = () => {
   /* The onSubmit function we takes the 'e' 
     or event and submits it to Firebase
     */
-  const onSubmit = e => {
-    /* 
+  const useSubmit = e => {
+    useEffect(
+      e => {
+        /* 
     preventDefault is important because it 
     prevents the whole page from reloading
     */
-    e.preventDefault()
-    firebase
-      .firestore()
-      .collection("items")
-      .add({
-        name,
-        type,
-        qty,
-        description,
-      })
-      //.then will reset the form to nothing
-      .then(() => setName(""), setType(""), setQty(''), setDescription(""))
+
+        e.preventDefault()
+
+        const lazyDatabase = import("firebase/firestore")
+        Promise.all([lazyDatabase])
+          .then(
+            getFirebase(firebase)
+              .firestore()
+              .collection("items")
+              .add({
+                name,
+                type,
+                qty,
+                description,
+              })
+          )
+          //.then will reset the form to nothing
+          .then(() => setName(""), setType(""), setQty(""), setDescription(""))
+      },
+      [e]
+    )
   }
 
   return (
-    <form onSubmit={onSubmit}>
-      <input placeholder="Name"
+    <form onSubmit={useSubmit}>
+      <input
+        placeholder="Name"
         value={name}
         name="name"
         //onChange take the event and set it to whatever is currently in the input.
@@ -41,19 +53,22 @@ const AddItemForm = () => {
         onChange={e => setName(e.currentTarget.value)}
         type="text"
       />
-      <input placeholder="Type"
+      <input
+        placeholder="Type"
         value={type}
         name="type"
         onChange={e => setType(e.currentTarget.value)}
         type="text"
       />
-      <input placeholder="Qty"
+      <input
+        placeholder="Qty"
         value={qty}
         name="qty"
         onChange={e => setQty(e.currentTarget.value)}
         type="number"
       />
-      <input placeholder="Description"
+      <input
+        placeholder="Description"
         value={description}
         name="description"
         onChange={e => setDescription(e.currentTarget.value)}

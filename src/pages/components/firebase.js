@@ -1,5 +1,7 @@
+/* 
 import firebase from "firebase/app"
-import "firebase/firestore"
+import "firebase/firestore" 
+*/
 
 const firebaseConfig = {
   apiKey: process.env.GATSBY_FIREBASE_API_KEY,
@@ -11,8 +13,15 @@ const firebaseConfig = {
   appId: process.env.GATSBY_FIREBASE_APP_ID,
   measurementId: process.env.GATSBY_FIREBASE_MEASUREMENT_ID,
 }
+let firebaseInstance
+const getFirebase = firebase => {
+  if (firebaseInstance) {
+    return firebaseInstance
+  }
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig)
-
-export default firebase
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig)
+  firebaseInstance = firebase
+  return firebase
+}
+export default getFirebase
