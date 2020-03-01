@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react"
-import firebase from "./firebase"
+//import firebase from "./firebase"
 import "../styles/global.css"
 import getFirebase from "./firebase"
 
 const useItems = () => {
   const [items, setItems] = useState([]) //useState() hook, sets initial state to an empty array
+
   useEffect(() => {
+    const firebase = import("firebase/app")
     const lazyDatabase = import("firebase/firestore")
-    const unsubscribe = Promise.all([lazyDatabase]).then(
+    const unsubscribe = Promise.all([lazyDatabase, firebase]).then(
       getFirebase(firebase)
         .firestore() //access firestore
         .collection("items") //access "items" collection
@@ -25,15 +27,25 @@ const useItems = () => {
   }, [])
   return items
 }
-const deleteItem = id => {
-  firebase
-    .firestore()
-    .collection("items")
-    .doc(id)
-    .delete()
+const useDeleteItem = id => {
+  useEffect(
+    id => {
+      const firebase = import("firebase/app")
+      const lazyDatabase = import("firebase/firestore")
+      Promise.all([lazyDatabase, firebase]).then(
+        getFirebase(firebase)
+          .firestore()
+          .collection("items")
+          .doc(id)
+          .delete()
+      )
+    },
+    [id]
+  )
 }
 const ItemList = ({ editItem }) => {
   const listItem = useItems()
+  const deleteItem = useDeleteItem()
   return (
     <table className="tg">
       <tbody>
@@ -42,7 +54,7 @@ const ItemList = ({ editItem }) => {
           <td className="tg-ycr8">Type</td>
           <td className="tg-i81m">Qty</td>
           <td className="tg-a02x">Description</td>
-          <td class="tg-6hdc"></td>
+          <td className="tg-6hdc"></td>
         </tr>
       </tbody>
       {listItem.map(item => (
@@ -52,7 +64,7 @@ const ItemList = ({ editItem }) => {
             <td className="tg-ycr8">{item.type}</td>
             <td className="tg-i81m">{item.qty}</td>
             <td className="tg-a02x">{item.description}</td>
-            <td class="tg-6hdc">
+            <td className="tg-6hdc">
               <button onClick={() => editItem(item)}>Edit</button>
               <button onClick={() => deleteItem(item.id)}>Delete</button>
             </td>

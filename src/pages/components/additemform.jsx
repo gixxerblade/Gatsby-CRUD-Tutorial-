@@ -5,7 +5,7 @@ const AddItemForm = () => {
   //useState() hook captures the value from the input value
   const [name, setName] = useState("")
   const [type, setType] = useState("")
-  const [qty, setQty] = useState(null)
+  const [qty, setQty] = useState("")
   const [description, setDescription] = useState("")
 
   /* The onSubmit function we takes the 'e' 
