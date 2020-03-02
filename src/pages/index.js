@@ -1,9 +1,11 @@
 import React, { useState } from "react"
-import firebase from "./components/firebase"
+//import firebase from "./components/firebase"
 import ItemList from "./components/itemlist"
 import AddItemForm from "./components/additemform"
 import "./styles/global.css"
 import UpdateItem from "./components/updateitem"
+import getFirebase from "./components/firebase"
+
 export default () => {
   const initialItemState = [
     { id: null, name: "", type: "", qty: "", description: "" },
@@ -31,13 +33,16 @@ export default () => {
       currentItem.id
     )
     setEditing(false)
-    firebase
-      .firestore()
-      .collection("items")
-      .doc(currentItem.id)
-      .update(updatedItem)
+    const lazyApp = import("firebase/app")
+    const lazyDatabase = import("firebase/firestore")
+    Promise.all([lazyApp, lazyDatabase]).then(([firebase]) => {
+      const firebaseDatabase = getFirebase(firebase).firestore()
+      firebaseDatabase
+        .collection("items")
+        .doc(currentItem.id)
+        .update(updatedItem)
+    })
   }
-
   return (
     <div>
       <h1>Firestore CRUD App</h1>

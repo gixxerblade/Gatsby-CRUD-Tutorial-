@@ -1,18 +1,17 @@
-import React, { useState, useEffect, lazy } from "react"
+import React, { useState, useEffect } from "react"
 //import firebase from "./firebase"
-import "../styles/global.css"
-import { getFirebase } from "./firebase"
-//import firebase from "firebase"
+import "../styles/global.css" //import firebase from "firebase"
+import getFirebase from "../components/firebase"
 const useItems = () => {
   const [items, setItems] = useState([]) //useState() hook, sets initial state to an empty array
-  const lazyApp = lazy(() => import("firebase/app"))
-  const lazyDatabase = lazy(() => import("firebase/firestore"))
-
   useEffect(() => {
-    /* const unsubscribe =  */ Promise.all([lazyApp, lazyDatabase]).then(
+    const lazyApp = import("firebase/app")
+    const lazyDatabase = import("firebase/firestore")
+
+    const unsubscribe = Promise.all([lazyApp, lazyDatabase]).then(
       ([firebase]) => {
-        const _firebase = getFirebase(firebase).firestore() //access firestore
-        _firebase
+        const firebaseDatabase = getFirebase(firebase).firestore() //access firestore
+        firebaseDatabase
           .collection("items") //access "items" collection
           //You can "listen" to a document with the onSnapshot() method.
           .onSnapshot(snapshot => {
@@ -26,24 +25,29 @@ const useItems = () => {
           })
       }
     )
-    /*     return () => unsubscribe()
-     */
-  }, [lazyApp, lazyDatabase])
+    return () => unsubscribe
+  }, [])
   return items
 }
-
 const deleteItem = id => {
-  /*   firebase
-    .firestore()
-    .collection("items")
-    .doc(id)
-    .delete()
- */
+  console.log(id)
+  const lazyApp = import("firebase/app")
+  const lazyDatabase = import("./firebase")
+  Promise.all([lazyApp, lazyDatabase]).then(([firebase]) => {
+    const firebaseDatabase = getFirebase(firebase).firestore()
+    firebaseDatabase
+      .collection("items")
+      .doc(id)
+      .delete()
+  })
 }
 
 const ItemList = ({ editItem }) => {
+  const [id, setId] = useState('1')
+  useEffect(() => {
+    deleteItem(id)
+  }, [id])
   const listItem = useItems()
-  console.log(listItem)
   return (
     <table className="tg">
       <tbody>
@@ -64,7 +68,7 @@ const ItemList = ({ editItem }) => {
             <td className="tg-a02x">{item.description}</td>
             <td className="tg-6hdc">
               <button onClick={() => editItem(item)}>Edit</button>
-              <button onClick={() => deleteItem(item.id)}>Delete</button>
+              <button onClick={() => setId(item.id)}>Delete</button>
             </td>
           </tr>
         </tbody>
