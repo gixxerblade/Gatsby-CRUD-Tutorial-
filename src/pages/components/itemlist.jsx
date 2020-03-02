@@ -1,51 +1,49 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, lazy } from "react"
 //import firebase from "./firebase"
 import "../styles/global.css"
-import getFirebase from "./firebase"
-
+import { getFirebase } from "./firebase"
+//import firebase from "firebase"
 const useItems = () => {
   const [items, setItems] = useState([]) //useState() hook, sets initial state to an empty array
+  const lazyApp = lazy(() => import("firebase/app"))
+  const lazyDatabase = lazy(() => import("firebase/firestore"))
 
   useEffect(() => {
-    const firebase = import("firebase/app")
-    const lazyDatabase = import("firebase/firestore")
-    const unsubscribe = Promise.all([lazyDatabase, firebase]).then(
-      getFirebase(firebase)
-        .firestore() //access firestore
-        .collection("items") //access "items" collection
-        .onSnapshot(snapshot => {
+    /* const unsubscribe =  */ Promise.all([lazyApp, lazyDatabase]).then(
+      ([firebase]) => {
+        const _firebase = getFirebase(firebase).firestore() //access firestore
+        _firebase
+          .collection("items") //access "items" collection
           //You can "listen" to a document with the onSnapshot() method.
-          const listItems = snapshot.docs.map(doc => ({
-            //map each document into snapshot
-            id: doc.id, //id and data pushed into items array
-            ...doc.data(), //spread operator merges data to id.
-          }))
-          setItems(listItems) //items is equal to listItems
-        })
+          .onSnapshot(snapshot => {
+            const listItems = snapshot.docs.map(doc => ({
+              //map each document into snapshot
+              id: doc.id, //id and data pushed into items array
+              ...doc.data(), //spread operator merges data to id.
+            }))
+            setItems(listItems) //items is equal to listItems
+            console.log(listItems)
+          })
+      }
     )
-    return () => unsubscribe()
-  }, [])
+    /*     return () => unsubscribe()
+     */
+  }, [lazyApp, lazyDatabase])
   return items
 }
-const useDeleteItem = id => {
-  useEffect(
-    id => {
-      const firebase = import("firebase/app")
-      const lazyDatabase = import("firebase/firestore")
-      Promise.all([lazyDatabase, firebase]).then(
-        getFirebase(firebase)
-          .firestore()
-          .collection("items")
-          .doc(id)
-          .delete()
-      )
-    },
-    [id]
-  )
+
+const deleteItem = id => {
+  /*   firebase
+    .firestore()
+    .collection("items")
+    .doc(id)
+    .delete()
+ */
 }
+
 const ItemList = ({ editItem }) => {
   const listItem = useItems()
-  const deleteItem = useDeleteItem()
+  console.log(listItem)
   return (
     <table className="tg">
       <tbody>

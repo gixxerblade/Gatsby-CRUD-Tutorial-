@@ -20,9 +20,9 @@ const AddItemForm = () => {
     */
 
         e.preventDefault()
-
+        const lazyApp = import("firebase/app")
         const lazyDatabase = import("firebase/firestore")
-        Promise.all([lazyDatabase])
+        Promise.all([lazyApp, lazyDatabase])
           .then(
             getFirebase(firebase)
               .firestore()
