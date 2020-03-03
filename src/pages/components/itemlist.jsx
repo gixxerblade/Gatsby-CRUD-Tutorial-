@@ -43,9 +43,10 @@ const deleteItem = id => {
 }
 
 const ItemList = ({ editItem }) => {
-  const [id, setId] = useState('1')
+  const [id, setId] = useState("1")
   useEffect(() => {
     deleteItem(id)
+    console.log(id, "was deleted")
   }, [id])
   const listItem = useItems()
   return (

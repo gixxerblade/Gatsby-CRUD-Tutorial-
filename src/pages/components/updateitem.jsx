@@ -4,12 +4,11 @@ import React, { useState, useEffect } from "react"
 So far we have passed the setEditing prop to index.js. 
 Now we are going to pass the currentItem prop
 */
-const UpdateItem = ({ setEditing, currentItem, updateItem }) => {
+const UpdateItem = ({ setEditing, currentItem, updateItem, submitting, setSubmitting }) => {
   /*
   Sets the state of the item to the current item
   */
   const [item, setItem] = useState(currentItem)
-
   /*
   Side effect is that without UseEffect if you start editing one item, 
   then try to switch to another item, nothing will happen.
@@ -27,7 +26,8 @@ const UpdateItem = ({ setEditing, currentItem, updateItem }) => {
   const onSubmit = e => {
     e.preventDefault()
     console.log("onSubmit passes the id and items", item)
-    updateItem({ currentItem }, item )
+    updateItem({ currentItem }, item)
+    setSubmitting(true)
   }
 
   const onChange = e => {

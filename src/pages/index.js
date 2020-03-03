@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 //import firebase from "./components/firebase"
 import ItemList from "./components/itemlist"
 import AddItemForm from "./components/additemform"
@@ -14,6 +14,7 @@ export default () => {
   const [editing, setEditing] = useState(false)
 
   const [currentItem, setCurrentItem] = useState(initialItemState)
+  const [submitting, setSubmitting] = useState(false)
 
   const editItem = item => {
     setEditing(true)
@@ -43,6 +44,9 @@ export default () => {
         .update(updatedItem)
     })
   }
+  useEffect(() => {
+    if (submitting) updateItem()
+  }, [submitting])
   return (
     <div>
       <h1>Firestore CRUD App</h1>
@@ -54,6 +58,8 @@ export default () => {
           setEditing={setEditing}
           currentItem={currentItem}
           updateItem={updateItem}
+          submitting={submitting}
+          setSubmitting={setSubmitting}
         />
       ) : (
         <AddItemForm />
