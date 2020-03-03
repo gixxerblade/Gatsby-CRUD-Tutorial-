@@ -1,38 +1,46 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import firebase from "firebase"
 import getFirebase from "./firebase"
+
 const AddItemForm = () => {
   //useState() hook captures the value from the input value
   const [name, setName] = useState("")
   const [type, setType] = useState("")
   const [qty, setQty] = useState("")
   const [description, setDescription] = useState("")
-  /* The onSubmit function we takes the 'e' 
+  /* 
+    The onSubmit function we takes the 'e' 
     or event and submits it to Firebase
     */
-  const onSubmit = e => {
+  const onSubmit = async e => {
     e.preventDefault()
-    /* 
+  }
+  /* 
     preventDefault is important because it 
     prevents the whole page from reloading
     */
+  useEffect(() => {
     const lazyApp = import("firebase/app")
     const lazyDatabase = import("firebase/firestore")
-    Promise.all([lazyApp, lazyDatabase])
-      .then(
-        getFirebase(firebase)
-          .firestore()
-          .collection("items")
-          .add({
-            name,
-            type,
-            qty,
-            description,
-          })
-      )
-      //.then will reset the form to nothing
-      .then(() => setName(""), setType(""), setQty(""), setDescription(""))
-  }
+    const addSomething = () => {
+      Promise.all([lazyApp, lazyDatabase])
+        .then(
+          getFirebase(firebase)
+            .firestore()
+            .collection("items")
+            .add({
+              name,
+              type,
+              qty,
+              description,
+            })
+        )
+        //.then will reset the form to nothing
+        .then(() => setName(""), setType(""), setQty(""), setDescription(""))
+    }
+    return () => addSomething()
+  }, [description, name, qty, type])
+
   return (
     <form onSubmit={onSubmit}>
       <input
