@@ -2,17 +2,20 @@ import React, { useState, useEffect } from "react"
 //import firebase from "./firebase"
 import "../styles/global.css" //import firebase from "firebase"
 import getFirebase from "../components/firebase"
+
 const useItems = () => {
   const [items, setItems] = useState([]) //useState() hook, sets initial state to an empty array
   useEffect(() => {
     const lazyApp = import("firebase/app")
-    const lazyDatabase = import("firebase/firestore")
+    const lazyDatabase = import("@firebase/firestore")
 
     const unsubscribe = Promise.all([lazyApp, lazyDatabase]).then(
       ([firebase]) => {
-        const firebaseDatabase = getFirebase(firebase).firestore() //access firestore
+        const firebaseDatabase = getFirebase(firebase)
+          .firestore()
+          .collection("items") //access firestore
         firebaseDatabase
-          .collection("items") //access "items" collection
+          //access "items" collection
           //You can "listen" to a document with the onSnapshot() method.
           .onSnapshot(snapshot => {
             const listItems = snapshot.docs.map(doc => ({
@@ -32,7 +35,7 @@ const useItems = () => {
 const deleteItem = id => {
   console.log(id)
   const lazyApp = import("firebase/app")
-  const lazyDatabase = import("./firebase")
+  const lazyDatabase = import("@firebase/firestore")
   Promise.all([lazyApp, lazyDatabase]).then(([firebase]) => {
     const firebaseDatabase = getFirebase(firebase).firestore()
     firebaseDatabase

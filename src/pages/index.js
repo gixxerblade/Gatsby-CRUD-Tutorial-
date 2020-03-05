@@ -35,7 +35,7 @@ export default () => {
     )
     setEditing(false)
     const lazyApp = import("firebase/app")
-    const lazyDatabase = import("firebase/firestore")
+    const lazyDatabase = import("@firebase/firestore")
     Promise.all([lazyApp, lazyDatabase]).then(([firebase]) => {
       const firebaseDatabase = getFirebase(firebase).firestore()
       firebaseDatabase

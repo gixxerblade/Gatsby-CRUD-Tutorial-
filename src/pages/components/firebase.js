@@ -16,9 +16,12 @@ const getFirebase = firebase => {
   if (firebaseInstance) {
     return firebaseInstance
   }
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig)
-  firebaseInstance = firebase
+  if (typeof window !== "undefined") {
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig)
+    firebaseInstance = firebase
+  }
   return firebase
 }
 export default getFirebase
+
